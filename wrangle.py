@@ -19,7 +19,7 @@ def new_familyhome_data():
         SELECT bedroomcnt, bathroomcnt, calculatedfinishedsquarefeet, taxvaluedollarcnt, yearbuilt, taxamount, fips
         from properties_2017
         join propertylandusetype using (propertylandusetypeid)
-        join  architecturalstyletype using (architecturalstyletypeid)
+        
         where	propertylandusetypeid = '261';
                 """
     
@@ -30,7 +30,11 @@ def new_familyhome_data():
 
 def wrangle_zillow():
 
-    df = pd.read_sql(sql_query, get_db_url('zillow'))
+    df = new_familyhome_data()
+    df = df.dropna()
     df = df.astype({'fips': 'int64', 'yearbuilt': 'int64', 'bedroomcnt': 'int64'})
+    df = df[df.bathroomcnt <= 6]
+    df = df[df.bedroomcnt <= 6]
+    df = df[df.taxvaluedollarcnt < 2_000_000]
     return df
 
